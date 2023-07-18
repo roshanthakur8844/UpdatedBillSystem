@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bill System - Login</title>
+  <style>
+    /* CSS styles */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #F0F0FF;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .login-container {
+      max-width: 400px;
+      background-color: #FFFFFF;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .login-title {
+      text-align: center;
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .login-input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: 1px solid #CCC;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    .login-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: #FFF;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .login-button:focus {
+      outline: none;
+    }
+
+    .bill-system-container {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #F0F0FF;
+      padding: 20px;
+      z-index: 1;
+    }
+
+    .bill-title {
+      text-align: center;
+    }
+
+    .bill-input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #CCC;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    .bill-button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: #FFF;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #CCC;
+    }
+
+    .total {
+      font-weight: bold;
+    }
+
+    .download {
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h1 class="login-title">Login</h1>
+    <form id="loginForm" class="login-form">
+      <label for="username">Username:</label>
+      <input type="text" id="username" class="login-input" required>
+
+      <label for="password">Password:</label>
+      <input type="password" id="password" class="login-input" required>
+
+      <button type="button" onclick="login()" class="login-button">Login</button>
+    </form>
+  </div>
+
+  <div id="billSystem" class="bill-system-container">
+    <div class="container">
+      <h1 class="bill-title">Bill System</h1>
+      <form id="billForm">
+        <label for="customerName">Customer Name:</label>
+        <input type="text" id="customerName" class="bill-input" required>
+
+        <label for="phoneNumber">Phone Number:</label>
+        <input type="text" id="phoneNumber" class="bill-input" required>
+
+        <label for="productName">Product Name:</label>
+        <input type="text" id="productName" class="bill-input" required>
+
+        <label for="productRate">Product Rate:</label>
+        <input type="number" id="productRate" class="bill-input" required>
+
+        <label for="productQuantity">Product Quantity:</label>
+        <input type="number" id="productQuantity" class="bill-input" required>
+
+        <button type="button" onclick="addItem()" class="bill-button">Add Item</button>
+      </form>
+
+      <table id="billTable">
+        <tr>
+          <th>Product</th>
+          <th>Quantity</th>
+          <th>Price</th>
+        </tr>
+      </table>
+
+      <div id="totalAmount" class="total"></div>
+
+      <div class="download">
+        <button type="button" onclick="downloadBill()" class="bill-button">Download Bill</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // JavaScript code
+    var billItems = [];
+
+    function login() {
+      var username = document.getElementById("username").value;
+      var password = document.getElementById("password").value;
+
+      // Check if username and password match
+      if (username === "rk" && password === "1234") {
+        document.getElementById("loginForm").style.display = "none";
+        document.getElementById("billSystem").style.display = "block";
+      } else {
+        alert("Invalid credentials. Please try again.");
+      }
+    }
+
+    function addItem() {
+      var productName = document.getElementById("productName").value;
+      var productRate = parseFloat(document.getElementById("productRate").value);
+      var productQuantity = parseInt(document.getElementById("productQuantity").value);
+
+      if (productName !== "" && !isNaN(productRate) && !isNaN(productQuantity)) {
+        var price = productRate * productQuantity;
+        billItems.push({ name: productName, quantity: productQuantity, price: price });
+
+        var table = document.getElementById("billTable");
+        var row = table.insertRow();
+        var nameCell = row.insertCell();
+        var quantityCell = row.insertCell();
+        var priceCell = row.insertCell();
+
+        nameCell.textContent = productName;
+        quantityCell.textContent = productQuantity;
+        priceCell.textContent = price.toFixed(2);
+
+        updateTotalAmount();
+      }
+    }
+
+    function updateTotalAmount() {
+      var totalAmount = 0;
+
+      for (var i = 0; i < billItems.length; i++) {
+        totalAmount += billItems[i].price;
+      }
+
+      document.getElementById("totalAmount").textContent = "Total Amount: ₹" + totalAmount.toFixed(2);
+    }
+
+    function downloadBill() {
+      if (billItems.length === 0) {
+        alert("No items added to the bill.");
+        return;
+      }
+
+      var customerName = document.getElementById("customerName").value;
+      var phoneNumber = document.getElementById("phoneNumber").value;
+
+      if (customerName === "" || phoneNumber === "") {
+        alert("Customer details are required.");
+        return;
+      }
+
+      var billContent = "Customer Name: " + customerName + "\nPhone Number: " + phoneNumber + "\n\n";
+      billContent += "Product\t\tQuantity\tPrice\n";
+
+      for (var i = 0; i < billItems.length; i++) {
+        billContent += billItems[i].name + "\t\t" + billItems[i].quantity + "\t\t" + billItems[i].price.toFixed(2) + "\n";
+      }
+
+      billContent += "\nTotal Amount: ₹" + getTotalAmount().toFixed(2);
+
+      var link = document.createElement("a");
+      link.href = "data:text/plain;charset=utf-8," + encodeURIComponent(billContent);
+      link.download = "bill.txt";
+      link.click();
+    }
+
+    function getTotalAmount() {
+      var totalAmount = 0;
+
+      for (var i = 0; i < billItems.length; i++) {
+        totalAmount += billItems[i].price;
+      }
+
+      return totalAmount;
+    }
+  </script>
+</body>
+</html>
